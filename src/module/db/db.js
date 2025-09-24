@@ -7,7 +7,7 @@ export async function connection(uri = process.env.MONGO_URI || DEFAULT_URI) {
     await mongoose.connect(uri)
     console.log('MongoDB connected')
   } catch (err) {
-    console.error('MongoDB connection error:', err)
+    console.error('MongoDB connection error:')
     throw err
   }
 }

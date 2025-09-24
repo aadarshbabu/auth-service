@@ -3,6 +3,7 @@ import express from 'express';
 import { closeConnection, connection } from './module/db/db.js';
 import authRouter from './module/auth/controller.js'
 import bodyParser from 'body-parser';
+import { MongooseError } from 'mongoose';
 
     const app = express();
     app.use(bodyParser.json())
@@ -21,8 +22,11 @@ import bodyParser from 'body-parser';
             const port = process.env.PORT || 3000
             app.listen(port, () => console.log(`Server listening on ${port}`))
         } catch (err) {
-            console.error('Failed to start app due to DB error', err)
-            await closeConnection()
+            if(err instanceof MongooseError){
+                console.error('Failed to start app due to DB error', err)
+            }else{
+                await closeConnection()
+            }
             process.exit(1)
         }
     }
