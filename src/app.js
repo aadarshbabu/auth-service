@@ -1,26 +1,30 @@
 
 import express from 'express';
-import { connection } from './module/db/db.js';
+import { closeConnection, connection } from './module/db/db.js';
 import authRouter from './module/auth/controller.js'
 import bodyParser from 'body-parser';
 
-const PORT=3000;
-const HOSTNAME='localhost'
+    const app = express();
+    app.use(bodyParser.json())
 
-const app = express();
-app.use(bodyParser.json())
-
-connection();
-
-app.get('/', (req, res)=>{
-    res.json({
-        message: "api is running."
+    app.get('/', (req, res)=>{
+        res.json({
+            message: "api is running."
+        })
     })
-})
-
-app.use(authRouter)
+    app.use(authRouter)
 
 
-app.listen(PORT,HOSTNAME,()=>{
-    console.log("Server is running on PORT", PORT);
-})
+    const start = async () => {
+        try {
+            await connection()
+            const port = process.env.PORT || 3000
+            app.listen(port, () => console.log(`Server listening on ${port}`))
+        } catch (err) {
+            console.error('Failed to start app due to DB error', err)
+            await closeConnection()
+            process.exit(1)
+        }
+    }
+
+start()
